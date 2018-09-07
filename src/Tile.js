@@ -57,9 +57,9 @@ class Tile extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.selectedLabel === this.props.item.key || nextProps.selectedLabel === this.props.item.key || nextProps.zoom !== this.props.zoom) {
-      return true 
-    } 
+    if ((this.props.selectedLabel === this.props.item.key || nextProps.selectedLabel === this.props.item.key || nextProps.zoom !== this.props.zoom) && this.props.widthLabel > 0) {
+      return true
+    }
     return false
   }
 
