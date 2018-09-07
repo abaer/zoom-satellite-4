@@ -36,14 +36,11 @@ class Tile extends Component {
   constructor(props) {
     super(props)
     this.toggleSelect = this.toggleSelect.bind(this);
-    this.wth = React.createRef()
-    const testData = this.props.item.data
-    const normData = normalizeData(testData)
+    const normData = normalizeData(this.props.item.data)
     this.state = { tweets: [], selected: false, normData }
   }
 
   getText(tail, img_type) {
-
     const imageWidth = (img_type !== undefined) ? 95 : 20
     const width = this.props.widthLabel - imageWidth
     const lines = (width > 400 ? 2 : 3)
@@ -60,19 +57,13 @@ class Tile extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.selectedLabel === this.props.item.key) {
-      return true
-    } else if (nextProps.selectedLabel === this.props.item.key) {
-      return true
-    } else if (nextProps.zoom !== this.props.zoom) {
-      return true
-    }
+    if (this.props.selectedLabel === this.props.item.key || nextProps.selectedLabel === this.props.item.key || nextProps.zoom !== this.props.zoom) {
+      return true 
+    } 
     return false
   }
 
   render() {
-    console.log("Render", this.props.item.key)
-    const graphWidth = this.props.widthGraph
     const tail = selectTail(this.props.item.label_info)
     const { src, img_type } = getImage(this.props.item.label_info)
     const visible = (this.props.zoom <= this.props.item.count) ? "on" : "off"
@@ -96,7 +87,7 @@ class Tile extends Component {
             </div>
           </Col>
           <Col xs={2} md={3} className="main_detail">
-            <Sparkle data={this.state.normData} height={30} width={graphWidth} meta={this.props.meta} />
+            <Sparkle data={this.state.normData} height={30} width={this.props.widthGraph} meta={this.props.meta} />
           </Col>
         </Row>
         <Row>
