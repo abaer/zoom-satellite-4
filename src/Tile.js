@@ -46,7 +46,9 @@ class Tile extends Component {
   getText(tail, img_type) {
 
     const imageWidth = (img_type !== undefined) ? 95 : 20
-    const width = this.props.wx.current.offsetWidth - imageWidth
+    // const width = this.props.wx.current.offsetWidth - imageWidth
+
+    const width =  this.props.widthLabel - imageWidth
     const lines = (width > 400 ? 2 : 3)
     const tx = fit2(lines, this.props.item.title, tail, width)
     const main_text = (!this.state.selected) ? tx.texts.join(" ") : this.props.item.title
@@ -72,7 +74,10 @@ class Tile extends Component {
   }
 
   render() {
-    const graphWidth =  this.props.wx.current.parentNode.parentNode.childNodes[1].childNodes[0].offsetWidth
+    console.log("Render", this.props.item.key)
+    // const graphWidth =  this.props.wx.current.parentNode.parentNode.childNodes[1].childNodes[0].offsetWidth
+    const graphWidth = this.props.widthGraph
+    // const graphWidth =  this.props.wx.current.childNodes[1].childNodes[0].offsetWidth
     const tail = selectTail(this.props.item.label_info)
     const { src, img_type } = getImage(this.props.item.label_info)
     const visible = (this.props.zoom <= this.props.item.count) ? "on" : "off"

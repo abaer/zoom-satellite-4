@@ -11,15 +11,26 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.stateSetterLight = this.stateSetterLight.bind(this);
-    this.wx = React.createRef()
     this.labelSelectorBroadcast = this.labelSelectorBroadcast.bind(this);
-    this.state = { labels: {}, statuses: [], zoom: 2, selectedLabel: null, wx: 0 };
+    this.state = { labels: {}, statuses: [], zoom: 2, selectedLabel: null, widthLabel:0, widthGraph:0 };
   }
+
+
+  refCallbackLabel = element => {
+    if (element) {
+      //Don't want to have to update state twice
+      const widthLabel = element.getBoundingClientRect().width
+      const widthGraph = element.parentNode.nextSibling.firstChild.getBoundingClientRect().width
+      console.log("label width: ", widthLabel);
+      console.log("graph width", widthGraph);
+      this.setState({widthLabel, widthGraph})
+    }
+  };
+
   labelSelectorBroadcast(key) {
     const selectedLabel = (this.state.selectedLabel === null) ? key : null
     this.setState({ selectedLabel })
   }
-
 
   stateSetterLight(r) {
     console.log("r")
@@ -27,9 +38,8 @@ class App extends Component {
   }
 
   componentDidMount() {
-    console.log(this.wx.current.offsetWidth)
-   
-    this.setState({ wx: this.wx })
+    // console.log(this.wx.current.offsetWidth)
+    // this.setState({ wx: this.wx })
   }
 
   componentWillMount = () => {
@@ -67,8 +77,8 @@ class App extends Component {
             <Row>
               <Col xs={0} md={1} lg={1}></Col><Col xs={12} md={10} lg={9}>
                 <Row style={{ height: "0px" }}>
-                  <Col style={{ border: "0px yellow solid" }} xs={10} md={9}><div ref={this.wx}> </div></Col>
-                  <Col style={{ border: "0px yellow solid" }} xs={2} md={3}><div> </div></Col>
+                  <Col xs={10} md={9}><div ref={this.refCallbackLabel}> </div></Col>
+                  <Col xs={2} md={3}><div> </div></Col>
                 </Row>
               </Col>
             </Row>
@@ -84,7 +94,7 @@ class App extends Component {
             </Row>
                 {Object.keys(this.state.labels).map((key, i) => {
                   return (
-                    <div key={`row_${i}`}> <Tile item={this.state.labels[key]} zoom={this.state.zoom} selectedLabel={this.state.selectedLabel} broadcastSelected={this.labelSelectorBroadcast} wx={this.state.wx} meta={this.state.meta}/> </div>)
+                    <div key={`row_${i}`}> <Tile item={this.state.labels[key]} zoom={this.state.zoom} selectedLabel={this.state.selectedLabel} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph}/> </div>)
                 }
                 )}
               </Col>
