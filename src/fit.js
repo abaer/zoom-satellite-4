@@ -1,4 +1,6 @@
-import { unesc } from './utils.js'
+import {
+  unesc
+} from './utils.js'
 
 const element = document.createElement('canvas');
 const context = element.getContext("2d");
@@ -9,13 +11,9 @@ function get_tex_size(txt, font) {
   return context.measureText(txt).width;
 }
 
- const fit2 = (maxLines = 1, text, tail_text, lineWidth) => {
+const fit2 = (maxLines = 1, text, tail_text, lineWidth) => {
   let char_mode = false
   text = unesc(text)
-  // let {
-  //   text,
-  //   tail_text
-  // } = getTexts(key)
 
   text = text + " *" // hack
   const tail_length = get_tex_size(tail_text, "600 " + fit_font)
@@ -42,17 +40,17 @@ function get_tex_size(txt, font) {
     elipses = (store_words.length > 1 && return_text.length === maxLines - 1 && trial_text.slice(-4, -1) !== " ...") ? " ... " : ""
     let tail = ""
     let width = 0;
-    
-    if (return_text.length === maxLines - 1){
+
+    if (return_text.length === maxLines - 1) {
       tail = tail_text
       width = get_tex_size(trial_text + elipses + " ", "400 " + fit_font) + tail_length;
-    } else if (return_text.length !== maxLines - 1 && length_so_far + start_words.length >= initial_length-1){
+    } else if (return_text.length !== maxLines - 1 && length_so_far + start_words.length >= initial_length - 1) {
       width = get_tex_size(trial_text, "400 " + fit_font)
-      if((width + tail_length)<=lineWidth){
+      if ((width + tail_length) <= lineWidth) {
         width = width + tail_length;
         tail = tail_text
         early_tail = true
-      } 
+      }
     } else {
       width = get_tex_size(trial_text, "400 " + fit_font)
     }
@@ -66,12 +64,12 @@ function get_tex_size(txt, font) {
       start_words = store_words
       store_words = []
       if (tail_present)
-        early_tail=true
+        early_tail = true
     }
     store_words.unshift(start_words.pop())
   }
 
-    if (return_text.length < maxLines && tail_text !== "" && early_tail !== true) {
+  if (return_text.length < maxLines && tail_text !== "" && early_tail !== true) {
     // elipses = (length_so_far <  > 1 && trial_text.slice(-4, -1) != " ...") ? " ..." : elipses
     return_text.push("")
   }
@@ -80,5 +78,7 @@ function get_tex_size(txt, font) {
     tail: tail_text
   }
 }
-  
-export {fit2}
+
+export {
+  fit2
+}

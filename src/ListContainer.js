@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import { Component } from 'react';
 
 class ListContainer extends Component {
   constructor(props) {
@@ -22,7 +22,7 @@ class ListContainer extends Component {
 
   render() {
   }
-    
+
 }
 
 

@@ -15,7 +15,7 @@ function Tweets(props) {
               <a href={url} target='_blank'>
                 <div className="tweet_detail">
                   <div className='avatar_container'>
-                    <img className="avatar" src={imageUrl} alt={item.screen_name}/>
+                    <img className="avatar" src={imageUrl} alt={item.screen_name} />
                   </div>
                   <div>
                     <span className="tweet_user">{item.screen_name}</span>: {text}
