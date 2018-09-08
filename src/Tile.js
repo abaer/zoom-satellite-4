@@ -41,7 +41,7 @@ class Tile extends Component {
   }
 
   getText(tail, img_type) {
-    const imageWidth = (img_type !== undefined) ? 95 : 20
+    const imageWidth = (img_type !== undefined) ? 88 : 20
     const width = this.props.widthLabel - imageWidth
     const lines = (width > 400 ? 2 : 3)
     const tx = fit2(lines, this.props.item.title, tail, width)
@@ -57,7 +57,11 @@ class Tile extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if ((this.props.selectedLabel === this.props.item.key || nextProps.selectedLabel === this.props.item.key || nextProps.zoom !== this.props.zoom) && this.props.widthLabel > 0) {
+    if ((this.props.selectedLabel === this.props.item.key || nextProps.selectedLabel === this.props.item.key) && this.props.widthLabel > 0) {
+      return true
+    } else if(nextProps.zoom > this.props.zoom && this.props.item.count < nextProps.zoom && this.props.item.count >= this.props.zoom ){
+      return true
+    } else if(nextProps.zoom < this.props.zoom && this.props.item.count >= nextProps.zoom && this.props.item.count < this.props.zoom){
       return true
     }
     return false
@@ -80,7 +84,7 @@ class Tile extends Component {
                 <ConditionalImage src={src} img_type={img_type} />
                 <div id="header_text" style={{ paddingTop: `${topPadding}px` }}>
                   <a href={this.props.item.tag} className={(selected) ? "" : 'disabled-link'} target={(selected) ? "" : "_blank"} >
-                    <span className={highlightClass}>{main_text} <span className={`tail ${highlightClass}`}>[{tail}]</span></span>
+                    <span className={highlightClass}>{main_text} <span className={`tail`}>[{tail}]</span></span>
                   </a>
                 </div>
               </div>

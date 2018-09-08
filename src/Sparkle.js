@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import {
-  scaleLinear,
-  scaleSqrt
-} from "d3-scale";
 
 import {
   interpolateViridis
@@ -23,8 +19,10 @@ const bar_base = {
 class Sparkle extends Component {
   constructor(props) {
     super();
-    const yScale = scaleSqrt().domain(props.meta.yMeta).range([5, props.height]);
-    const xScale = scaleLinear().domain([props.meta.xMeta[0], props.meta.xMeta[1] + .1*(props.meta.xMeta[1]-props.meta.xMeta[0])]).range([bar_base.width, props.width - bar_base.width]);
+    const yScale = props.meta.yScale
+    const xScale = props.meta.xScale
+    // const yScale = scaleSqrt().domain(props.meta.yMeta).range([5, props.height]);
+    // const xScale = scaleLinear().domain([props.meta.xMeta[0], props.meta.xMeta[1] + .1*(props.meta.xMeta[1]-props.meta.xMeta[0])]).range([bar_base.width, props.width - bar_base.width]);
     const rangeData = props.data.map(pt => {return {x:xScale(pt.x), y:yScale(pt.y)}})
     const colr = (props.data[0].x - props.meta.xMeta[0])/(props.meta.xMeta[1]- props.meta.xMeta[0])
     const hue = interpolateViridis((1-colr*.95))
