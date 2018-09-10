@@ -34,7 +34,6 @@ class App extends Component {
   }
   refCallbackChart = element => {
     if (element) {
-    const widthGraph = element.getBoundingClientRect().width
     this.stateUpdater({ widthGraph })
     }
 

@@ -84,7 +84,7 @@ class Tile extends Component {
                 <ConditionalImage src={src} img_type={img_type} />
                 <div id="header_text" style={{ paddingTop: `${topPadding}px` }}>
                   <a href={this.props.item.tag} className={(selected) ? "" : 'disabled-link'} target={(selected) ? "" : "_blank"} >
-                    <span className={highlightClass}>{main_text} <span className={`tail`}>[{tail}]</span></span>
+                    <span className={highlightClass}>{main_text} <span className={`tail`}> [{tail}]</span></span>
                   </a>
                 </div>
               </div>
