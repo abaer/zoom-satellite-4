@@ -6,7 +6,7 @@ import { getDateString } from './utils.js'
 import { zoom2 } from './zoom.js'
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { addTweetsToLabels, makeMeta } from './data';
-import {scaleLinear, scaleSqrt} from "d3-scale";
+import { scaleLinear, scaleSqrt } from "d3-scale";
 
 class App extends Component {
   constructor(props) {
@@ -24,26 +24,15 @@ class App extends Component {
     for (const k of needKeys) {
       if (!keys.has(k)) {
         return
-      } 
+      }
     }
+
     //Set up range functions once and pass to Sparkles
     this.ts.meta.yScale = scaleSqrt().domain(this.ts.meta.yMeta).range([5, 30]);
-    this.ts.meta.xScale = scaleLinear().domain([this.ts.meta.xMeta[0], this.ts.meta.xMeta[1] + .1*(this.ts.meta.xMeta[1]-this.ts.meta.xMeta[0])]).range([2, this.ts.widthGraph - 2]);
+    this.ts.meta.xScale = scaleLinear().domain([this.ts.meta.xMeta[0], this.ts.meta.xMeta[1] + .1 * (this.ts.meta.xMeta[1] - this.ts.meta.xMeta[0])]).range([2, this.ts.widthGraph - 2]);
     this.setState(this.ts)
     console.log("State Done", this.state)
   }
-  refCallbackChart = element => {
-    if (element) {
-    this.stateUpdater({ widthGraph })
-    }
-
-  }
-  refCallbackLabel = element => {
-    if (element) {
-      const widthLabel = element.getBoundingClientRect().width
-      this.stateUpdater({ widthLabel })
-    }
-  };
 
   labelSelectorBroadcast(key) {
     const selectedLabel = (this.state.selectedLabel === null) ? key : null
@@ -54,6 +43,22 @@ class App extends Component {
     console.log("r")
     this.setState({ zoom: r });
   }
+
+  refCallbackChart = element => {
+    if (element) {
+      console.log(element.getBoundingClientRect())
+      const widthGraph = element.getBoundingClientRect().width
+      this.stateUpdater({ widthGraph })
+    }
+
+  }
+  refCallbackLabel = element => {
+    if (element) {
+      console.log(element.getBoundingClientRect())
+      const widthLabel = element.getBoundingClientRect().width
+      this.stateUpdater({ widthLabel })
+    }
+  };
 
   componentWillMount = () => {
     const dt = getDateString()
@@ -84,6 +89,7 @@ class App extends Component {
         <div id="zoom-frame" style={{ width: "100%", position: "absolute", left: "0px", margin: '0px', padding: '0px' }}>
           <Grid fluid>
             {/*Test Grid for sizing */}
+
             <Row>
               <Col xs={0} md={1} lg={1}></Col><Col xs={12} md={10} lg={9}>
                 <Row style={{ height: "0px" }}>
@@ -95,7 +101,7 @@ class App extends Component {
             {/*Test Grid for sizing */}
 
             <Row>
-              <Col xs={0} md={1} lg={1}><Row></Row></Col>
+              <Col xs={0} md={1} lg={1}><Row> </Row></Col>
               <Col xs={12} md={10} lg={9}>
                 <Row>
                   <Col xs={12}>
