@@ -1,5 +1,4 @@
 
-
 function bounds(obj, key){
   const arr = obj.map(item => item[key])
   return [Math.min(...arr), Math.max(...arr)]

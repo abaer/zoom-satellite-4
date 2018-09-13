@@ -1,5 +1,5 @@
 function between(min, max, val) {
-  return Math.min(max, Math.max(min, val))
+  return Math.min(max, Math.max(min, parseInt(val)))
 }
 
 function rFromScale(scale, max_label_count) {
@@ -11,11 +11,12 @@ function scaleFromR(scale, max_label_count){
   return max_label_count - scale
 }
 
-const zoom2 = (r, stateHandlerFn, levels) => {
+const zoom2 = (targ, r, stateHandlerFn, levels) => {
+  // const targ = document.getElementById('root')
   let max_label_count = levels.length+1
   let candidateScale, correction, candidateR
   const multiplier = 2
-  const targ = document.getElementById('zoom-frame')
+  
 
   //Event handling
   function render(candidateScale){
@@ -25,7 +26,7 @@ const zoom2 = (r, stateHandlerFn, levels) => {
       r =candidate_zoom
       stateHandlerFn(levels[r-2])
     }
-    return false 
+    return false
   }
 
   function gesturestart(e) {
@@ -48,7 +49,7 @@ const zoom2 = (r, stateHandlerFn, levels) => {
     e.preventDefault();
     return false
   }
-
+  console.log("targ", targ)
   const eventhandlers = {"gesturestart":gesturestart, "gesturechange":gesturechange, "gestureend":gestureend}
   const keys = Object.keys(eventhandlers)
   for (const key of keys){

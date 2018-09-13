@@ -3,13 +3,14 @@ import React, {
 } from 'react';
 
 import { fit2 } from './fit.js'
-import { getImage, patchProfileURL } from './utils.js'
+import { getImage, patchProfileURL, unesc } from './utils.js'
 import Tweets from './Tweets'
 import { Row, Col } from 'react-flexbox-grid';
-import { SlideDown } from 'react-slidedown'
+import { SlideDown } from 'react-slidedown' 
 import 'react-slidedown/lib/slidedown.css'
-import { normalizeData } from './data';
+import { normalizeData } from './data'; 
 import Sparkle from './Sparkle'
+import Textfade from './Textfade'
 
 function ConditionalImage(props) {
   let src = props.src
@@ -37,21 +38,33 @@ class Tile extends Component {
     super(props)
     this.toggleSelect = this.toggleSelect.bind(this);
     const normData = normalizeData(this.props.item.data)
-    this.state = { tweets: [], selected: false, normData }
+    const { src, img_type } = getImage(this.props.item.label_info)
+    const imageWidth = (img_type !== undefined) ? 73 : 15
+    const labelWidth = Math.ceil(this.props.widthLabel - imageWidth)
+    const fullText = unesc(this.props.item.title)
+    this.state = { tweets: [], selected: false, normData, labelWidth, imgSrc: src, img_type, fullText, list:this.props.meta.list} //0:closed, 1: opening, 2: closing
   }
 
-  getText(tail, img_type) {
-    const imageWidth = (img_type !== undefined) ? 88 : 20
-    const width = this.props.widthLabel - imageWidth
-    const lines = (width > 400 ? 2 : 3)
-    const tx = fit2(lines, this.props.item.title, tail, width)
-    const main_text = (!this.state.selected) ? tx.texts.join(" ") : this.props.item.title
+  componentDidUpdate(){
+    if(this.props.meta.list!==this.state.list){
+      this.setState({list:this.props.meta.list})
+    }
+  }
+  
+  getText(tail) {
+    const lines = (this.state.labelWidth > 400 ? 2 : 3)
+    const tx = fit2(lines, this.props.item.title, tail, this.state.labelWidth)
+    const main_text = tx.texts.join("")
+    // const main_text = tx.texts.map(t => <span>{t}</span>)
+    
+    // main_text = main_text.join("")
     const topPadding = 76 / 2 - tx.texts.length * 10
     return { main_text, topPadding }
   }
 
   toggleSelect(e) {
     const selected = (this.props.selectedLabel === null)
+    // const selectedIndex = (selected) ? 1 : 2
     this.setState({ selected })
     this.props.broadcastSelected(this.props.item.key)
   }
@@ -59,21 +72,34 @@ class Tile extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if ((this.props.selectedLabel === this.props.item.key || nextProps.selectedLabel === this.props.item.key) && this.props.widthLabel > 0) {
       return true
-    } else if(nextProps.zoom > this.props.zoom && this.props.item.count < nextProps.zoom && this.props.item.count >= this.props.zoom ){
+    } else if (nextProps.zoom > this.props.zoom && this.props.item.count < nextProps.zoom && this.props.item.count >= this.props.zoom) {
       return true
-    } else if(nextProps.zoom < this.props.zoom && this.props.item.count >= nextProps.zoom && this.props.item.count < this.props.zoom){
+    } else if (nextProps.zoom < this.props.zoom && this.props.item.count >= nextProps.zoom && this.props.item.count < this.props.zoom) {
       return true
+    } else if(this.props.meta.list !== this.state.list){
+      return true;
     }
     return false
   }
 
   render() {
+    // console.log(this.props.selectedLabel, this.props.item.key, this.state.selected, this.props.previousSelected)
+    let selectedIndex = 0
+    if (this.props.selectedLabel !== null && this.props.item.key === this.props.selectedLabel) {
+      selectedIndex = 1
+    } else if (this.props.item.key === this.props.previousSelected) {
+      selectedIndex = 0
+    } 
+
     const tail = selectTail(this.props.item.label_info)
-    const { src, img_type } = getImage(this.props.item.label_info)
+    const { main_text, topPadding } = this.getText(tail)
+
+    const thinText = <span className="text_nohighlight">{main_text} <span className="tail">[{tail}]</span></span>
+    const fullText = <a href={this.props.item.tag} target="_blank"><span className="text_highlight">{this.state.fullText} <span className="tail">[{tail}]</span></span></a>
+
     const visible = (this.props.zoom <= this.props.item.count) ? "on" : "off"
     const selected = (this.props.selectedLabel === this.props.item.key)
-    const { main_text, topPadding } = this.getText(tail, img_type)
-    const highlightClass = (selected) ? "text_highlight" : "text_nohighlight"
+    
     return (
       <div className="totalContainer" onClick={this.toggleSelect}>
 
@@ -81,11 +107,10 @@ class Tile extends Component {
           <Col xs={10} md={9}>
             <div id="tile_container" className={`tile_container${(selected) ? "_selected" : ""}`}>
               <div id="header" className="main_detail" >
-                <ConditionalImage src={src} img_type={img_type} />
+                <ConditionalImage src={this.state.imgSrc} img_type={this.state.img_type} />
                 <div id="header_text" style={{ paddingTop: `${topPadding}px` }}>
-                  <a href={this.props.item.tag} className={(selected) ? "" : 'disabled-link'} target={(selected) ? "" : "_blank"} >
-                    <span className={highlightClass}>{main_text} <span className={`tail`}> [{tail}]</span></span>
-                  </a>
+
+                  <Textfade text1={thinText} text2={fullText} index={selectedIndex} width={this.state.labelWidth} />
                 </div>
               </div>
             </div>
