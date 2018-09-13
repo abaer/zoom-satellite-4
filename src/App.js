@@ -38,7 +38,7 @@ class App extends Component {
           meta.xScale = scaleLinear().domain([meta.xMeta[0], meta.xMeta[1] + .1 * (meta.xMeta[1] - meta.xMeta[0])]).range([2, this.state.widthGraph - 2]);
           meta.list = list_dir
           this.setState({ labels: d_all.labels, zoom: meta.startZoom, meta })
-          console.log(this.state)
+          zoom2(this.state.zoomElement, meta.startZoom, this.stateSetterLight, meta.steps)
           // this.stateUpdater({ labels: d_all.labels, zoom: meta.startZoom, meta })
         });
   }

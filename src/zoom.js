@@ -53,7 +53,8 @@ const zoom2 = (targ, r, stateHandlerFn, levels) => {
   const eventhandlers = {"gesturestart":gesturestart, "gesturechange":gesturechange, "gestureend":gestureend}
   const keys = Object.keys(eventhandlers)
   for (const key of keys){
-    targ.addEventListener(key, eventhandlers[key])
+    targ.removeEventListener(key, eventhandlers[key], true);  
+    targ.addEventListener(key, eventhandlers[key], true)
   }
 }
 
