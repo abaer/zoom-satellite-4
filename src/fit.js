@@ -4,7 +4,7 @@ import {
 
 const element = document.createElement('canvas');
 const context = element.getContext("2d");
-const fit_font = "14px 'Roboto Condensed', sans-serif"
+const fit_font = "15px 'Roboto Condensed', sans-serif"
 
 function get_tex_size(txt, font) {
   context.font = font;

@@ -25,7 +25,7 @@ const zoom2 = (r, stateHandlerFn, levels) => {
       r =candidate_zoom
       stateHandlerFn(levels[r-2])
     }
-    return false
+    return false 
   }
 
   function gesturestart(e) {
@@ -49,9 +49,10 @@ const zoom2 = (r, stateHandlerFn, levels) => {
     return false
   }
 
-  const eventhandlers = [gesturestart, gesturechange, gestureend]
-  for (const handler of eventhandlers){
-    targ.addEventListener(handler.name, handler)
+  const eventhandlers = {"gesturestart":gesturestart, "gesturechange":gesturechange, "gestureend":gestureend}
+  const keys = Object.keys(eventhandlers)
+  for (const key of keys){
+    targ.addEventListener(key, eventhandlers[key])
   }
 }
 
