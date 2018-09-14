@@ -24,7 +24,7 @@ class App extends Component {
   }
   
   handleData(ts){
-    console.log(ts)
+    
     const widthGraph = (ts.widthGraph !== undefined) ? ts.widthGraph : this.state.widthGraph
     const d_all = JSON.parse(ts.json)
     const meta = makeMeta(d_all.labels, d_all.statuses)
@@ -36,6 +36,7 @@ class App extends Component {
       delete ts.json
     }
     this.setState({...ts, labels: d_all.labels, zoom: meta.startZoom, meta })
+    console.log(this.state)
     zoom2(this.state.zoomElement, meta.startZoom, this.stateSetterLight, meta.steps)
   }
 
@@ -138,8 +139,12 @@ class App extends Component {
                   </Col>
                 </Row>
                 {Object.keys(this.state.labels).map((key, i) => {
+                 
+                  const myKey = this.state.labels[key].key
+                  const openState = (myKey === this.state.selectedLabel) ? "opening" : ((myKey === this.state.previousSelected) ? "closing" : null)
+
                   return (
-                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={this.state.labels[key]} zoom={this.state.zoom} selectedLabel={this.state.selectedLabel} previousSelected={this.state.previousSelected} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} /> </div>)
+                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={this.state.labels[key]} zoom={this.state.zoom} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} openState={openState} /> </div>)
                 }
                 )}
               </Col>

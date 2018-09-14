@@ -269,7 +269,8 @@ div.avatar_container {
 .tweet_detail {
   margin-top: 6px;
   background-color: #f5f8fa;
-  border: 1px solid #e6ecf0;
+  border: 1px solid #e6ecf0; 
+  /* border: 1px solid rgba(0, 250, 62, .15); */
   border-radius: 4px;
   padding: 6px;
   font-size: 14px;
@@ -356,7 +357,8 @@ a:visited {
 
 .tweet_detail:active,
 .tweet_detail:hover {
-  border-color: rgba(54, 88, 153, .5)
+  /* border-color: rgba(54, 88, 153, .5) */
+  border-color:  rgba(14, 253, 74, 0.25);
 }
 
 .tweet_user {
