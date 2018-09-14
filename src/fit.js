@@ -12,10 +12,6 @@ function get_tex_size(txt, font) {
  const fit2 = (maxLines = 1, text, tail_text, lineWidth) => {
   let char_mode = false
   text = unesc(text)
-  // let {
-  //   text,
-  //   tail_text
-  // } = getTexts(key)
 
   text = text + " *" // hack
   const tail_length = get_tex_size(tail_text, "700 " + fit_font)
