@@ -21,7 +21,6 @@ function getInitialZoom(dist, steps) {
 
 function getLevels(labels) {
   const keys = Object.keys(labels)
-
   const distrib = keys.reduce((dist, key) => {
     const cnt = labels[key].count
     return dist.set(cnt, (dist.has(cnt)) ? dist.get(cnt) + 1 : 1)
