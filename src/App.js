@@ -22,6 +22,7 @@ class App extends Component {
     this.state = { labels: {}, zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null, list:"gen_two"};
     this.ts = {}
   }
+  
   handleData(ts){
     console.log(ts)
     const widthGraph = (ts.widthGraph !== undefined) ? ts.widthGraph : this.state.widthGraph
