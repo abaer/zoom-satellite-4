@@ -39,7 +39,7 @@ class Tile extends Component {
     this.toggleSelect = this.toggleSelect.bind(this);
     const normData = normalizeData(this.props.item.data)
     const { src, img_type } = getImage(this.props.item.label_info)
-    const imageWidth = (img_type !== undefined) ? 73 : 15
+    const imageWidth = (img_type !== undefined) ? 75 : 15
     const labelWidth = Math.ceil(this.props.widthLabel - imageWidth)
     const fullText = unesc(this.props.item.title)
     this.state = { tweets: [], selected: false, normData, labelWidth, imgSrc: src, img_type, fullText, list:this.props.meta.list} //0:closed, 1: opening, 2: closing
@@ -104,7 +104,7 @@ class Tile extends Component {
       <div className="totalContainer" onClick={this.toggleSelect}>
 
         <Row className={`fade_${visible}`}>
-          <Col xs={10} md={9}>
+          <Col xs={10} md={8}>
             <div id="tile_container" className={`tile_container${(selected) ? "_selected" : ""}`}>
               <div id="header" className="main_detail" >
                 <ConditionalImage src={this.state.imgSrc} img_type={this.state.img_type} />
@@ -115,12 +115,12 @@ class Tile extends Component {
               </div>
             </div>
           </Col>
-          <Col xs={2} md={3} className="main_detail">
-            <Sparkle data={this.state.normData} height={30} width={this.props.widthGraph} meta={this.props.meta} />
+          <Col xs={2} md={4} className="main_detail">
+            <Sparkle data={this.state.normData} height={34} width={this.props.widthGraph} meta={this.props.meta} />
           </Col>
         </Row>
         <Row>
-          <Col xs={10} md={9}>
+          <Col xs={10} md={8}>
             <SlideDown className="react-slidedown" closed={!selected}>
               <Tweets tweets={this.props.item.data} selected={this.props.selectedLabel !== null} />
             </SlideDown>

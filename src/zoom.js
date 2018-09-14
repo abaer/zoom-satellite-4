@@ -11,6 +11,8 @@ function scaleFromR(scale, max_label_count){
   return max_label_count - scale
 }
 
+let oldFns = {}
+
 const zoom2 = (targ, r, stateHandlerFn, levels) => {
   // const targ = document.getElementById('root')
   let max_label_count = levels.length+1
@@ -38,7 +40,7 @@ const zoom2 = (targ, r, stateHandlerFn, levels) => {
     return false
   }
 
-  function gesturechange(e){
+  const gesturechange = (e) => {
     e.preventDefault();
     candidateScale = correction + multiplier * e.scale
     render(candidateScale);
@@ -49,13 +51,28 @@ const zoom2 = (targ, r, stateHandlerFn, levels) => {
     e.preventDefault();
     return false
   }
-  console.log("targ", targ)
-  const eventhandlers = {"gesturestart":gesturestart, "gesturechange":gesturechange, "gestureend":gestureend}
-  const keys = Object.keys(eventhandlers)
-  for (const key of keys){
-    targ.removeEventListener(key, eventhandlers[key], true);  
-    targ.addEventListener(key, eventhandlers[key], true)
+
+  //remove old functions if they exist before assigning handlers
+
+  const removeOldHandlers = (oldFns) => {
+    const okeys = Object.keys(oldFns)
+    for (const okey of okeys){
+      targ.removeEventListener(okey, oldFns[okey]);  
+    }
   }
+
+  const addZoomHandlers = () => {
+    const eventhandlers = {"gesturestart":gesturestart, "gesturechange":gesturechange, "gestureend":gestureend}
+     //stash old function so we can remove them when list changes
+    oldFns = eventhandlers
+    const keys = Object.keys(eventhandlers)
+    for (const key of keys){
+      // targ.removeEventListener(key, eventhandlers[key]);  
+      targ.addEventListener(key, eventhandlers[key])
+    }
+  }
+  removeOldHandlers(oldFns)
+  addZoomHandlers()
 }
 
 export { zoom2 }

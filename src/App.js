@@ -8,58 +8,60 @@ import { Grid, Row, Col } from 'react-flexbox-grid';
 import { addTweetsToLabels, makeMeta } from './data';
 import { scaleLinear, scaleSqrt } from "d3-scale";
 
+function makeS3Url(listDir, date = "today"){
+  const dt = (date === "today") ? getDateString() : date
+  const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}.json`
+  return listUrl
+}
 class App extends Component {
   constructor(props) {
     super(props);
     this.stateSetterLight = this.stateSetterLight.bind(this);
     this.listHandler = this.listHandler.bind(this);
     this.labelSelectorBroadcast = this.labelSelectorBroadcast.bind(this);
-    this.state = { labels: {}, zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null};
+    this.state = { labels: {}, zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null, list:"gen_two"};
     this.ts = {}
+  }
+  handleData(ts){
+    console.log(ts)
+    const widthGraph = (ts.widthGraph !== undefined) ? ts.widthGraph : this.state.widthGraph
+    const d_all = JSON.parse(ts.json)
+    const meta = makeMeta(d_all.labels, d_all.statuses)
+    addTweetsToLabels(d_all.labels, d_all.statuses)
+    //Set up scale functions for sparkles
+    meta.yScale = scaleSqrt().domain(meta.yMeta).range([5, 30]);
+    meta.xScale = scaleLinear().domain([meta.xMeta[0], meta.xMeta[1] + .1 * (meta.xMeta[1] - meta.xMeta[0])]).range([2, widthGraph - 2]);
+    if(ts.json !== undefined){
+      delete ts.json
+    }
+    this.setState({...ts, labels: d_all.labels, zoom: meta.startZoom, meta })
+    zoom2(this.state.zoomElement, meta.startZoom, this.stateSetterLight, meta.steps)
   }
 
   listHandler(e){
-      this.setState({selected:e.target.value});
-      console.log(e.target.value)
-      const dt = getDateString()
-      //const list_dir = 'test_dir_om_2'
-      const list_dir = e.target.value
-      const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${list_dir}/production/d3-${dt}.json`
-      // const defaultUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/test_dir_om_2/production/d3-7-9-2018.json`
+      const listDir = e.target.value
+      const listUrl = makeS3Url(listDir)
       fetch(listUrl)
         .then(response => {
           return response.json();
         })
         .then(myJson => {
-          const d_all = JSON.parse(myJson)
-          const meta = makeMeta(d_all.labels, d_all.statuses)
-          addTweetsToLabels(d_all.labels, d_all.statuses)
-          meta.yScale = scaleSqrt().domain(meta.yMeta).range([5, 30]);
-          meta.xScale = scaleLinear().domain([meta.xMeta[0], meta.xMeta[1] + .1 * (meta.xMeta[1] - meta.xMeta[0])]).range([2, this.state.widthGraph - 2]);
-          meta.list = list_dir
-          this.setState({ labels: d_all.labels, zoom: meta.startZoom, meta })
-          zoom2(this.state.zoomElement, meta.startZoom, this.stateSetterLight, meta.steps)
-          // this.stateUpdater({ labels: d_all.labels, zoom: meta.startZoom, meta })
+          let ts = {list:listDir, json:myJson}
+          this.handleData(ts)
         });
   }
 
   stateUpdater(update) {
     this.ts = { ...this.ts, ...update }
     const keys = new Set(Object.keys(this.ts))
-    const needKeys = ["widthLabel", "widthGraph", "labels", "meta"]
+    const needKeys = ["widthLabel", "widthGraph", "json"]
     for (const k of needKeys) {
       if (!keys.has(k)) {
         return
       }  
     }
-    //Set up range functions once and pass to Sparkles
-    this.ts.meta.yScale = scaleSqrt().domain(this.ts.meta.yMeta).range([5, 30]);
-    this.ts.meta.xScale = scaleLinear().domain([this.ts.meta.xMeta[0], this.ts.meta.xMeta[1] + .1 * (this.ts.meta.xMeta[1] - this.ts.meta.xMeta[0])]).range([2, this.ts.widthGraph - 2]);
-    this.ts.meta.list = "default"
-    this.setState(this.ts)
-    zoom2(this.state.zoomElement, this.ts.meta.startZoom, this.stateSetterLight, this.ts.meta.steps)
-    // z oom2(this.ts.meta.startZoom, this.stateSetterLight, this.ts.meta.steps)
-    console.log("State Done", this.state)
+    console.log("State Done", this.ts)
+    this.handleData(this.ts)
   }
 
   labelSelectorBroadcast(key) {
@@ -94,20 +96,14 @@ class App extends Component {
   }
 
   componentWillMount = () => {
-    const dt = getDateString()
     //const list_dir = 'test_dir_om_2'
-    const list_dir = 'gen_two'
-    const defaultUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${list_dir}/production/d3-${dt}.json`
-    // const defaultUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/test_dir_om_2/production/d3-7-9-2018.json`
+    const defaultUrl = makeS3Url(this.state.list)
     fetch(defaultUrl)
       .then(response => {
         return response.json();
       })
-      .then(myJson => {
-        const d_all = JSON.parse(myJson)
-        const meta = makeMeta(d_all.labels, d_all.statuses)
-        addTweetsToLabels(d_all.labels, d_all.statuses)
-        this.stateUpdater({ labels: d_all.labels, zoom: meta.startZoom, meta })
+      .then(json => {
+        this.stateUpdater({json})
       });
   }
 
@@ -122,10 +118,11 @@ class App extends Component {
             {/*Test Grid for sizing */}
 
             <Row>
-              <Col xs={0} md={1} lg={1}></Col><Col xs={12} md={10} lg={9}>
+              <Col xs={0} md={1} lg={1}></Col>
+              <Col xs={12} md={10} lg={9}>
                 <Row style={{ height: "0px" }}>
-                  <Col xs={10} md={9}><div ref={this.refCallbackLabel}> </div></Col>
-                  <Col xs={2} md={3}><div ref={this.refCallbackChart}> </div></Col>
+                  <Col xs={10} md={8}><div ref={this.refCallbackLabel}> </div></Col>
+                  <Col xs={2} md={4}><div ref={this.refCallbackChart}> </div></Col>
                 </Row>
               </Col>
             </Row>
@@ -141,7 +138,7 @@ class App extends Component {
                 </Row>
                 {Object.keys(this.state.labels).map((key, i) => {
                   return (
-                    <div key={`l_${this.state.meta.list}_r_${i}`}> <Tile item={this.state.labels[key]} zoom={this.state.zoom} selectedLabel={this.state.selectedLabel} previousSelected={this.state.previousSelected} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} /> </div>)
+                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={this.state.labels[key]} zoom={this.state.zoom} selectedLabel={this.state.selectedLabel} previousSelected={this.state.previousSelected} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} /> </div>)
                 }
                 )}
               </Col>
