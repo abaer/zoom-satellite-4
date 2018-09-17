@@ -37,7 +37,7 @@ class Tile extends Component {
   constructor(props) {
     super(props)
     this.toggleSelect = this.toggleSelect.bind(this);
-    const normData = normalizeData(this.props.item.data)
+    const normData = normalizeData(this.props.item.tweet_data)
     const { src, img_type } = getImage(this.props.item.label_info)
     const imageWidth = (img_type !== undefined) ? 75 : 15
     const labelWidth = Math.ceil(this.props.widthLabel - imageWidth)
@@ -114,7 +114,7 @@ class Tile extends Component {
         <Row>
           <Col xs={10} md={8}>
             <SlideDown className="react-slidedown" closed={!selected}>
-              <Tweets tweets={this.props.item.data} selected={this.props.openState == "opening"} />
+              <Tweets tweets={this.props.item.tweet_data} selected={this.props.openState === "opening"} />
             </SlideDown>
 
           </Col>

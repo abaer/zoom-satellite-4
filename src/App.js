@@ -5,12 +5,13 @@ import Toolbar from './Toolbar'
 import { getDateString } from './utils.js'
 import { zoom2 } from './zoom.js'
 import { Grid, Row, Col } from 'react-flexbox-grid';
-import { addTweetsToLabels, makeMeta } from './data';
 import { scaleLinear, scaleSqrt } from "d3-scale";
+import { getInitialZoom } from './data';
 
 function makeS3Url(listDir, date = "today"){
   const dt = (date === "today") ? getDateString() : date
-  const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}.json`
+  const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}-label_format.json`
+  // const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}.json`
   return listUrl
 }
 class App extends Component {
@@ -19,23 +20,22 @@ class App extends Component {
     this.stateSetterLight = this.stateSetterLight.bind(this);
     this.listHandler = this.listHandler.bind(this);
     this.labelSelectorBroadcast = this.labelSelectorBroadcast.bind(this);
-    this.state = { labels: {}, zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null, list:"gen_two"};
+    this.state = { labelArray: [], zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null, list:"gen_two"};
     this.ts = {}
   }
   
   handleData(ts){
-    
     const widthGraph = (ts.widthGraph !== undefined) ? ts.widthGraph : this.state.widthGraph
-    const d_all = JSON.parse(ts.json)
-    const meta = makeMeta(d_all.labels, d_all.statuses)
-    addTweetsToLabels(d_all.labels, d_all.statuses)
+    const labels = JSON.parse(ts.json)
+    const meta = labels["meta_data"]
+    meta.startZoom = getInitialZoom(meta.step_counts, meta.steps)
     //Set up scale functions for sparkles
     meta.yScale = scaleSqrt().domain(meta.yMeta).range([5, 30]);
     meta.xScale = scaleLinear().domain([meta.xMeta[0], meta.xMeta[1] + .1 * (meta.xMeta[1] - meta.xMeta[0])]).range([2, widthGraph - 2]);
     if(ts.json !== undefined){
       delete ts.json
     }
-    this.setState({...ts, labels: d_all.labels, zoom: meta.startZoom, meta })
+    this.setState({...ts, zoom: meta.startZoom, meta, labelArray:labels.label_data })
     console.log(this.state)
     zoom2(this.state.zoomElement, meta.startZoom, this.stateSetterLight, meta.steps)
   }
@@ -97,7 +97,7 @@ class App extends Component {
     }
   }
 
-  componentWillMount = () => {
+  componentDidMount = () => {
     //const list_dir = 'test_dir_om_2'
     const defaultUrl = makeS3Url(this.state.list)
     fetch(defaultUrl)
@@ -138,13 +138,12 @@ class App extends Component {
                     <Toolbar zoom={this.state.zoom} listHandler={this.listHandler}/>
                   </Col>
                 </Row>
-                {Object.keys(this.state.labels).map((key, i) => {
-                 
-                  const myKey = this.state.labels[key].key
+                {this.state.labelArray.map((item, i) => {
+                  const myKey = item.key
                   const openState = (myKey === this.state.selectedLabel) ? "opening" : ((myKey === this.state.previousSelected) ? "closing" : null)
 
                   return (
-                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={this.state.labels[key]} zoom={this.state.zoom} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} openState={openState} /> </div>)
+                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={item} zoom={this.state.zoom} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} openState={openState} /> </div>)
                 }
                 )}
               </Col>
