@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import './App.css';
 import Tile from './Tile'
 import Toolbar from './Toolbar'
-import { getDateString } from './utils.js'
+import { getDateString, updateUrlBox } from './utils.js'
 import { zoom2 } from './zoom.js'
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { scaleLinear, scaleSqrt } from "d3-scale";
 import { getInitialZoom } from './data';
+import {listmappings, listmappings_by_dir} from './settings'
+
 
 function makeS3Url(listDir, date = "today"){
   const dt = (date === "today") ? getDateString() : date
@@ -20,8 +22,20 @@ class App extends Component {
     this.stateSetterLight = this.stateSetterLight.bind(this);
     this.listHandler = this.listHandler.bind(this);
     this.labelSelectorBroadcast = this.labelSelectorBroadcast.bind(this);
-    this.state = { labelArray: [], zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null, list:"gen_two"};
+    this.state = { labelArray: [], zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null, list:"gen_two", listName:"Alan", meta:null}
     this.ts = {}
+  }
+
+  getListFromUrl(){
+    var urlParams = new URLSearchParams(window.location.search);
+    const listName = urlParams.get('list')
+    console.log(listName)
+    if(listmappings[listName] !== undefined){
+      this.setState({list:listmappings[listName],listName:listName})
+      return listmappings[listName];
+    }
+    //  return this.state.list;
+     return listmappings[this.state.listName]
   }
   
   handleData(ts){
@@ -42,13 +56,15 @@ class App extends Component {
 
   listHandler(e){
       const listDir = e.target.value
+      const listName = listmappings_by_dir[listDir]
+      updateUrlBox(listName)
       const listUrl = makeS3Url(listDir)
       fetch(listUrl)
         .then(response => {
           return response.json();
         })
         .then(myJson => {
-          let ts = {list:listDir, json:myJson}
+          let ts = {list:listDir, listName, json:myJson}
           this.handleData(ts)
         });
   }
@@ -99,7 +115,8 @@ class App extends Component {
 
   componentDidMount = () => {
     //const list_dir = 'test_dir_om_2'
-    const defaultUrl = makeS3Url(this.state.list)
+    const listDir = this.getListFromUrl()
+    const defaultUrl = makeS3Url(listDir)
     fetch(defaultUrl)
       .then(response => {
         return response.json();
@@ -118,7 +135,6 @@ class App extends Component {
         <div id="zoom-frame" className="zoom-frame" ref={this.refCallbackZoom}>
           <Grid fluid>
             {/*Test Grid for sizing */}
-
             <Row>
               <Col xs={0} md={1} lg={1}></Col>
               <Col xs={12} md={10} lg={9}>
@@ -135,15 +151,14 @@ class App extends Component {
               <Col xs={12} md={10} lg={9}>
                 <Row>
                   <Col xs={12}>
-                    <Toolbar zoom={this.state.zoom} listHandler={this.listHandler}/>
+                    <Toolbar zoom={this.state.zoom} listHandler={this.listHandler} meta={this.state.meta} list={this.state.list}/>
                   </Col>
                 </Row>
                 {this.state.labelArray.map((item, i) => {
                   const myKey = item.key
                   const openState = (myKey === this.state.selectedLabel) ? "opening" : ((myKey === this.state.previousSelected) ? "closing" : null)
-
                   return (
-                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={item} zoom={this.state.zoom} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} openState={openState} /> </div>)
+                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={item} zoom={this.state.zoom} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} openState={openState} list={this.state.list}/> </div>)
                 }
                 )}
               </Col>

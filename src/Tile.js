@@ -93,7 +93,7 @@ class Tile extends Component {
     // const selected = (this.props.selectedLabel === this.props.item.key)
     
     return (
-      <div className="totalContainer" onClick={this.toggleSelect}>
+      <div className="totalContainer" onClick={this.toggleSelect} id={"tile_container_"+this.props.item.key}>
 
         <Row className={`fade_${visible}`}>
           <Col xs={10} md={8}>
@@ -101,7 +101,6 @@ class Tile extends Component {
               <div id="header" className="main_detail" >
                 <ConditionalImage src={this.state.imgSrc} img_type={this.state.img_type} />
                 <div id="header_text" style={{ paddingTop: `${topPadding}px` }}>
-
                   <Textfade text1={thinText} text2={fullText} index={(this.props.openState === "opening") ? 1 : 0} width={this.state.labelWidth} />
                 </div>
               </div>
@@ -116,9 +115,7 @@ class Tile extends Component {
             <SlideDown className="react-slidedown" closed={!selected}>
               <Tweets tweets={this.props.item.tweet_data} selected={this.props.openState === "opening"} />
             </SlideDown>
-
           </Col>
-
         </Row>
       </div>
     );

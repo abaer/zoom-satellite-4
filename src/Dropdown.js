@@ -11,7 +11,7 @@ import React, {
     'Ottolenghi': 'test_dir_ottolenghi',
     'OM': 'test_dir_om_2',
     'Mark_Jardine': 'test_dir_jardine',
-    'Jack': 'dir_jack'
+    'Abrams': 'dir_abrams'
   }
 
   class Dropdown extends Component {
@@ -24,8 +24,8 @@ import React, {
 
     render() {
       return (
-        <select name="select" onChange={this.props.listHandler}>
-        {this.state.listObjs.map(function(opt) { 
+        <select name="select" value={this.props.list} onChange={this.props.listHandler}>
+        {this.state.listObjs.map( opt => { 
             return (<option key={opt.dir} value={opt.dir} >{opt.name}</option>);
         })}
       </select>

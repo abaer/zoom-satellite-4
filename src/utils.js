@@ -16,6 +16,20 @@ const getImage = (label_info) => {
   return { src: undefined, img_type: undefined }
 }
 
+
+const updateUrlBox = (newList) => {
+  var url = window.location.href;
+  var urlParts = url.split('?');
+  if (urlParts.length > 0) {
+    var baseUrl = urlParts[0];
+    var updatedUri = baseUrl + '?list=' + newList;
+    window.history.pushState({
+      path: updatedUri
+    }, document.title, updatedUri);
+    // window.history.replaceState({}, document.title, updatedUri);
+  }
+}
+
 function patchProfileURL(src) {
   var lastIndex = src.lastIndexOf("_");
   var tail = src.substring(src.lastIndexOf("."), )
@@ -38,4 +52,4 @@ function bounds(obj, key){
   return [Math.min(...arr), Math.max(...arr)]
 }
 
-export { getDateString, getImage, patchProfileURL, unesc, bounds }
+export { getDateString, getImage, patchProfileURL, unesc, bounds, updateUrlBox }

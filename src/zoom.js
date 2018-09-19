@@ -48,6 +48,7 @@ const zoom2 = (targ, r, stateHandlerFn, levels) => {
   }
 
   function gestureend(e) {
+    // console.log(e.target)
     e.preventDefault();
     return false
   }

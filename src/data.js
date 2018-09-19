@@ -1,6 +1,6 @@
 function getInitialZoom(dist, steps) {
-  const rowMax = 43;
-  for (const zoom in steps) {
+  const rowMax = 40;
+  for (const zoom of steps) {
     if (dist[zoom] <= rowMax) {
       return zoom
     }

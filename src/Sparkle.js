@@ -21,9 +21,8 @@ class Sparkle extends Component {
     super();
     const yScale = props.meta.yScale
     const xScale = props.meta.xScale
-    // const yScale = scaleSqrt().domain(props.meta.yMeta).range([5, props.height]);
-    // const xScale = scaleLinear().domain([props.meta.xMeta[0], props.meta.xMeta[1] + .1*(props.meta.xMeta[1]-props.meta.xMeta[0])]).range([bar_base.width, props.width - bar_base.width]);
     const rangeData = props.data.map(pt => {return {x:xScale(pt.x), y:yScale(pt.y)}})
+    // const minX = Math.min(...props.data.map(d=>d.x))
     const colr = (props.data[0].x - props.meta.xMeta[0])/(props.meta.xMeta[1]- props.meta.xMeta[0])
     const hue = interpolateViridis((1-colr*.95))
     const barWidth = 2.5
@@ -32,6 +31,7 @@ class Sparkle extends Component {
       barWidth,
       hue
     };
+   
   }
 
   
@@ -40,7 +40,6 @@ class Sparkle extends Component {
     // const width = (this.state.minXGap > 2) ? 2 : 1
     // const leftMargM1 = (i > 0) ? Math.floor(this.state.rangeData[i-1].x - width*i) : 0
     let leftMarg = (i > 0) ? Math.floor(x - this.state.rangeData[i-1].x - width) : Math.floor(x)
-   
     if(leftMarg  < width -1){
       leftMarg = leftMarg +.5
       // width = 1;
@@ -53,7 +52,6 @@ class Sparkle extends Component {
       width: width,
       marginLeft: leftMarg,
       backgroundColor:this.state.hue,
-      // borderLeft:`3px solid ${borderHue}`
     }
   }
 
@@ -61,7 +59,6 @@ class Sparkle extends Component {
     return (
         <div style={container}>
           {this.state.rangeData.map((d, i, all) => {
-    
             const style = this.bar(d.x, d.y, i, all)
             return (<div style={style} key={`sparkle_${i}`}></div>)
           })}
