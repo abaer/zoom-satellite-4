@@ -2,7 +2,8 @@ import React, {
   Component
 } from 'react';
 
-import { fit2 } from './fit.js'
+// import { fit2 } from './fit.js'
+import fit3 from './fit.1.js'
 import { getImage, patchProfileURL, unesc } from './utils.js'
 import Tweets from './Tweets'
 import { Row, Col } from 'react-flexbox-grid';
@@ -48,17 +49,34 @@ class Tile extends Component {
   componentDidUpdate(){
     if(this.props.meta.list!==this.state.list){
       this.setState({list:this.props.meta.list})
-    }
+    } 
   }
+
+  getText2(tail) {
+    const lines = (this.props.widthLabel >= 350 ? 2 : 3)
   
-  getText(tail) {
-    const lines = (this.state.labelWidth > 400 ? 2 : 3)
-    const tx = fit2(lines, this.props.item.title, tail, this.state.labelWidth)
-    const main_text = tx.texts.join("")
-    // const main_text = tx.texts.map(t => <span>{t}</span>)
-    // main_text = main_text.join("")
-    const topPadding = 76 / 2 - tx.texts.length * 10
-    return { main_text, topPadding }
+    const {returnLinesText, returnLinesTailText, sep} = fit3 (lines, this.props.item.title, tail, this.state.labelWidth+3)
+
+    const tailFlat = returnLinesTailText.text.flat()
+    // const mainTextFlat = returnLinesText.text.flat()
+    if(tailFlat[0] === "..."){
+      tailFlat.shift()
+      // mainTextFlat.push("...")
+      returnLinesText.textNew[returnLinesText.textNew.length-1] = returnLinesText.textNew[returnLinesText.textNew.length-1] + " ... "
+    }
+    // const mainTextNew = mainTextFlat.join(sep)
+    const mainTextNew = returnLinesText.textNew.join(sep)
+
+    // const mainTextNew = returnLinesText.textNew.map((line,i) => {
+    //   if(i === returnLinesText.textNew.length-1 || line === ""){
+    //     return(<span>{line}</span>)
+    //   } else{
+    //     return(<span>{line}|<br/></span>)
+    //   }
+    //   })
+    const tailNew = tailFlat.join(" ")
+    const topPaddingNew = 76 / 2 - returnLinesTailText.text.length * 10
+    return { mainTextNew, tailNew, topPaddingNew }
   }
 
   toggleSelect(e) {
@@ -72,8 +90,7 @@ class Tile extends Component {
       return true
     } else if(this.props.meta.list !== this.state.list){
       return true;
-    }
-
+    } 
     if(nextProps.openState === "opening" || nextProps.openState === "closing"){
       return true
     }
@@ -82,10 +99,18 @@ class Tile extends Component {
 
   render() {
     const tail = selectTail(this.props.item.label_info)
-    const { main_text, topPadding } = this.getText(tail)
+    let height = null
+    if(this.props.openState === 'opening'){
+      //Calculate height
+      const {returnLinesText, returnLinesTailText, sep} = fit3 (15, this.props.item.title + "_" + tail, "tail", this.state.labelWidth)
+      height = (returnLinesText.lengths.length > returnLinesTailText.lengths.length) ? returnLinesText.lengths.length : returnLinesTailText.lengths.length
+    }
+    const heightText = (height === null) ? "" : "(" + height + ")"
+    // const { main_text, topPadding } = this.getText(tail)
+    const { mainTextNew, tailNew, topPaddingNew } = this.getText2(`... [${tail}]`)
 
-    const thinText = <span className="text_nohighlight">{main_text} <span className="tail">[{tail}]</span></span>
-    const fullText = <a href={this.props.item.tag} target="_blank"><span className="text_highlight">{this.state.fullText} <span className="tail">[{tail}]</span></span></a>
+    const thinText = <span className="text_nohighlight">{mainTextNew} <span className="tail">{tailNew}</span></span>
+    const fullText = <a href={this.props.item.tag} target="_blank"><span className="text_highlight">{this.state.fullText} <span className="tail">{tailNew}</span></span></a>
 
     const visible = (this.props.zoom <= this.props.item.count) ? "on" : "off"
    
@@ -100,7 +125,7 @@ class Tile extends Component {
             <div id="tile_container" className={`tile_container${(selected) ? "_selected" : ""}`}>
               <div id="header" className="main_detail" >
                 <ConditionalImage src={this.state.imgSrc} img_type={this.state.img_type} />
-                <div id="header_text" style={{ paddingTop: `${topPadding}px` }}>
+                <div id="header_text" style={{ paddingTop: `${topPaddingNew}px` }}>
                   <Textfade text1={thinText} text2={fullText} index={(this.props.openState === "opening") ? 1 : 0} width={this.state.labelWidth} />
                 </div>
               </div>

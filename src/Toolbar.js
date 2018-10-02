@@ -14,7 +14,7 @@ function Toolbar(props) {
         <span id="zoom_log">{stepCount}/{stepPoints}</span>
       </div>
       <div className="page_log" style={{marginLeft:"25px"}}> List: 
-              <Dropdown listHandler={props.listHandler} list={props.list} />
+              <Dropdown {...props} />
       </div>
     </div>
   );

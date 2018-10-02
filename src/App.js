@@ -7,10 +7,10 @@ import { zoom2 } from './zoom.js'
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { scaleLinear, scaleSqrt } from "d3-scale";
 import { getInitialZoom } from './data';
-import {listmappings, listmappings_by_dir} from './settings'
+import { listmappings, keyByVal } from './settings'
 
 
-function makeS3Url(listDir, date = "today"){
+function makeS3Url(listDir, date = "today") {
   const dt = (date === "today") ? getDateString() : date
   const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}-label_format.json`
   // const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}.json`
@@ -19,26 +19,30 @@ function makeS3Url(listDir, date = "today"){
 class App extends Component {
   constructor(props) {
     super(props);
-    this.stateSetterLight = this.stateSetterLight.bind(this);
+    this.stateSetterZoom = this.stateSetterZoom.bind(this);
     this.listHandler = this.listHandler.bind(this);
     this.labelSelectorBroadcast = this.labelSelectorBroadcast.bind(this);
-    this.state = { labelArray: [], zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0 ,previousSelected:null, list:"gen_two", listName:"Alan", meta:null}
+    this.state = { labelArray: [], zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0, previousSelected: null, listDir: "gen_two", meta: null }
     this.ts = {}
   }
 
-  getListFromUrl(){
+  getListFromUrl() {
     var urlParams = new URLSearchParams(window.location.search);
     const listName = urlParams.get('list')
-    console.log(listName)
-    if(listmappings[listName] !== undefined){
-      this.setState({list:listmappings[listName],listName:listName})
-      return listmappings[listName];
+    if (listName === undefined || listName === null){
+      return this.state.listDir
     }
-    //  return this.state.list;
-     return listmappings[this.state.listName]
+    const listNameLower = listName.toLowerCase()
+    console.log(listNameLower)
+    if (listmappings[listNameLower] === undefined){
+      return this.state.listDir
+    } else {
+      this.setState({ listDir: listmappings[listNameLower]  })
+      return listmappings[listNameLower];    
+    }
   }
-  
-  handleData(ts){
+
+  handleData(ts) {
     const widthGraph = (ts.widthGraph !== undefined) ? ts.widthGraph : this.state.widthGraph
     const labels = JSON.parse(ts.json)
     const meta = labels["meta_data"]
@@ -46,27 +50,28 @@ class App extends Component {
     //Set up scale functions for sparkles
     meta.yScale = scaleSqrt().domain(meta.yMeta).range([5, 30]);
     meta.xScale = scaleLinear().domain([meta.xMeta[0], meta.xMeta[1] + .1 * (meta.xMeta[1] - meta.xMeta[0])]).range([2, widthGraph - 2]);
-    if(ts.json !== undefined){
+    if (ts.json !== undefined) {
       delete ts.json
     }
-    this.setState({...ts, zoom: meta.startZoom, meta, labelArray:labels.label_data })
+    this.setState({ ...ts, zoom: meta.startZoom, meta, labelArray: labels.label_data })
     console.log(this.state)
-    zoom2(this.state.zoomElement, meta.startZoom, this.stateSetterLight, meta.steps)
+    zoom2(this.state.zoomElement, meta.startZoom, this.stateSetterZoom, meta.steps)
   }
 
-  listHandler(e){
-      const listDir = e.target.value
-      const listName = listmappings_by_dir[listDir]
-      updateUrlBox(listName)
-      const listUrl = makeS3Url(listDir)
-      fetch(listUrl)
-        .then(response => {
-          return response.json();
-        })
-        .then(myJson => {
-          let ts = {list:listDir, listName, json:myJson}
-          this.handleData(ts)
-        });
+  listHandler(e) {
+    const dir = e.target.value
+    const name = keyByVal(listmappings, dir)
+    updateUrlBox(name)
+    const listUrl = makeS3Url(dir)
+    fetch(listUrl)
+      .then(response => {
+        return response.json();
+      })
+      .then(myJson => {
+        const previousSelected = this.state.selectedLabel
+        let ts = { listDir:dir, json: myJson, selectedLabel:null, previousSelected}
+        this.handleData(ts)
+      });
   }
 
   stateUpdater(update) {
@@ -76,7 +81,7 @@ class App extends Component {
     for (const k of needKeys) {
       if (!keys.has(k)) {
         return
-      }  
+      }
     }
     console.log("State Done", this.ts)
     this.handleData(this.ts)
@@ -85,12 +90,14 @@ class App extends Component {
   labelSelectorBroadcast(key) {
     const previousSelected = this.state.selectedLabel
     const selectedLabel = (this.state.selectedLabel === null) ? key : null
-    this.setState({ selectedLabel, previousSelected})
+    this.setState({ selectedLabel, previousSelected })
   }
 
-  stateSetterLight(r) {
+  stateSetterZoom(r) {
     console.log("r")
-    this.setState({ zoom: r });
+    // this.setState({ selectedLabel:null, previousSelected:null })
+    const previousSelected = this.state.selectedLabel
+    this.setState({ zoom: r, selectedLabel:null, previousSelected });
   }
 
   refCallbackChart = element => {
@@ -109,7 +116,7 @@ class App extends Component {
 
   refCallbackZoom = element => {
     if (element) {
-      this.setState({zoomElement:element})
+      this.setState({ zoomElement: element })
     }
   }
 
@@ -122,7 +129,7 @@ class App extends Component {
         return response.json();
       })
       .then(json => {
-        this.stateUpdater({json})
+        this.stateUpdater({ json })
       });
   }
 
@@ -151,14 +158,14 @@ class App extends Component {
               <Col xs={12} md={10} lg={9}>
                 <Row>
                   <Col xs={12}>
-                    <Toolbar zoom={this.state.zoom} listHandler={this.listHandler} meta={this.state.meta} list={this.state.list}/>
+                    <Toolbar zoom={this.state.zoom} listHandler={this.listHandler} meta={this.state.meta} list={this.state.listDir} mappings={listmappings} />
                   </Col>
                 </Row>
                 {this.state.labelArray.map((item, i) => {
                   const myKey = item.key
                   const openState = (myKey === this.state.selectedLabel) ? "opening" : ((myKey === this.state.previousSelected) ? "closing" : null)
                   return (
-                    <div key={`l_${this.state.list}_r_${i}`}> <Tile item={item} zoom={this.state.zoom} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} openState={openState} list={this.state.list}/> </div>)
+                    <div key={`l_${this.state.listDir}_r_${i}`}> <Tile item={item} zoom={this.state.zoom} broadcastSelected={this.labelSelectorBroadcast} meta={this.state.meta} widthLabel={this.state.widthLabel} widthGraph={this.state.widthGraph} openState={openState} list={this.state.listDir} /> </div>)
                 }
                 )}
               </Col>

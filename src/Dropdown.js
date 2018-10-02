@@ -1,36 +1,16 @@
 
-import React, {
-    Component
-  } from 'react';
-  
-  
-  const listmappings = {
-    'Alan': 'gen_two',
-    'Jeff_Dean': 'test_dir_d',
-    'Kaveh_Akbar': 'test_dir_akbar_2',
-    'Ottolenghi': 'test_dir_ottolenghi',
-    'OM': 'test_dir_om_2',
-    'Mark_Jardine': 'test_dir_jardine',
-    'Abrams': 'dir_abrams'
-  }
+import React from 'react';
 
-  class Dropdown extends Component {
-    constructor(props) {
-      super(props)
-      const lists = Object.keys(listmappings)
-      const listObjs = lists.map(key => {return {name:key, dir:listmappings[key]}})
-      this.state = { selected:"gen_two",  listObjs} 
-    }
+function Dropdown(props) {
+  const lists = Object.keys(props.mappings)
+  return (
+    <select name="select" value={props.list} onChange={props.listHandler}>
+      {lists.map(name => {
+        const val = props.mappings[name]
+        return (<option key={val} value={val} >{name}</option>);
+      })}
+    </select>
+  );
+}
 
-    render() {
-      return (
-        <select name="select" value={this.props.list} onChange={this.props.listHandler}>
-        {this.state.listObjs.map( opt => { 
-            return (<option key={opt.dir} value={opt.dir} >{opt.name}</option>);
-        })}
-      </select>
-      );
-    }
-  }
-  
-  export default Dropdown
+export default Dropdown

@@ -29,6 +29,7 @@ function get_tex_size(txt, font) {
   let length_so_far = 0;
   let early_tail = false
   let elipses = ""
+  let lastWidth = 0
   while (start_words.length > 0 & return_text.length < maxLines) {
     let trial_text = (char_mode === false) ? start_words.join(" ") : start_words.join("")
     if (trial_text.slice(-1) === "*") {
@@ -51,6 +52,7 @@ function get_tex_size(txt, font) {
       } 
     } else {
       width = get_tex_size(trial_text, "400 " + fit_font)
+      
     }
 
     if (width <= lineWidth) {
@@ -64,16 +66,19 @@ function get_tex_size(txt, font) {
       if (tail_present)
         early_tail=true
     }
+    lastWidth = width
     store_words.unshift(start_words.pop())
   }
 
     if (return_text.length < maxLines && tail_text !== "" && early_tail !== true) {
+      return_text.push("")
     // elipses = (length_so_far <  > 1 && trial_text.slice(-4, -1) != " ...") ? " ..." : elipses
-    return_text.push("")
+    
   }
   return {
     texts: return_text,
-    tail: tail_text
+    tail: tail_text,
+    width: lastWidth + tail_length
   }
 }
   

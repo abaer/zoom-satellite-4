@@ -1,25 +1,23 @@
 const listmappings = {
-    'Alan': 'gen_two',
-    'Jeff_Dean': 'test_dir_d',
-    'Kaveh_Akbar': 'test_dir_akbar_2',
-    'Ottolenghi': 'test_dir_ottolenghi',
-    'OM': 'test_dir_om_2',
-    'Mark_Jardine': 'test_dir_jardine',
-    'Abrams': 'dir_abrams'
+    'alan': 'gen_two',
+    'jeff_dean': 'test_dir_d',
+    'kaveh_akbar': 'test_dir_akbar_2',
+    'ottolenghi': 'test_dir_ottolenghi',
+    'om': 'test_dir_om_2',
+    'mark_jardine': 'test_dir_jardine',
+    'abrams': 'dir_abrams'
 }
 
-function swap(json) {
-    var ret = {};
+function keyByVal(json, val){
     for (var key in json) {
-        ret[json[key]] = key;
+        if(json[key] === val){
+            return key
+        }
     }
-    return ret;
+    return undefined
 }
-
-const listmappings_by_dir = swap(listmappings)
-
 
 export {
     listmappings,
-    listmappings_by_dir
+    keyByVal
 }

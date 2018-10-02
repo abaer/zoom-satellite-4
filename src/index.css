@@ -44,7 +44,7 @@ select {
 
 @keyframes full_show {
   from {
-    opacity: 0.0;
+    opacity: 0;
     position: absolute;
   }
 
@@ -54,24 +54,22 @@ select {
   }
 }
 
-
-
- @keyframes full_hide {
+@keyframes full_hide {
   0% {
     opacity: 1;
-    position: relative
+    position: absolute
   }
 
   90% {
     opacity: .9;
-    position: relative
+    position: absolute
   }
 
   100% {
     opacity: 0;
-    position: absolute
+    position: relative
   }
-} 
+}
 
 .thin_show_anim {
   animation-name: thin_show;
@@ -101,7 +99,7 @@ select {
   /* visibility: hidden; */
 }
 
-.full_show_css {
+.full_show {
   animation-name: full_show;
   animation-duration: .8s;
   transition-duration: .8s;

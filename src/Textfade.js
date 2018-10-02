@@ -12,7 +12,7 @@ class TextFade extends Component {
     super(props)
     this.state = { initial: true } //initial:closed, 1: closed, 2: opening
     this.thin_styles = ["thin_show_anim_quick","thin_show_anim",  "thin_hide"]
-    this.full_styles = ["full_hide", "full_hide full_hide_anim", "full_show_css"]
+    this.full_styles = ["full_hide", "full_hide full_hide_anim", "full_show"]
   }
 
    componentDidMount() {
