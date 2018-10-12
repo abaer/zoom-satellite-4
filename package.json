@@ -1,7 +1,7 @@
 {
   "name": "ts4",
   "version": "0.1.0",
-  "homepage": "http://twitter-satellite.com/react-client/",
+  "homepage": "http://twitter-satellite.com/",
   "private": true,
   "dependencies": {
     "d3-scale": "^2.1.2",

@@ -40,10 +40,14 @@ class Tile extends Component {
     this.toggleSelect = this.toggleSelect.bind(this);
     const normData = normalizeData(this.props.item.tweet_data)
     const { src, img_type } = getImage(this.props.item.label_info)
-    const imageWidth = (img_type !== undefined) ? 75 : 15
-    const labelWidth = Math.ceil(this.props.widthLabel - imageWidth)
+    const imageWidth = (img_type !== undefined) ? 75 : 18
+    const labelWidth = Math.ceil(this.props.widthLabel - imageWidth) + 2
     const fullText = unesc(this.props.item.title)
-    this.state = { tweets: [], normData, labelWidth, imgSrc: src, img_type, fullText, list:this.props.meta.list} //0:closed, 1: opening, 2: closing
+
+    const tail = selectTail(this.props.item.label_info)
+    const { mainTextNew, tailNew, topPaddingNew } = this.getText2(`... [${tail}]`, labelWidth)
+
+    this.state = { tweets: [], normData, labelWidth, imgSrc: src, img_type, fullText, list:this.props.meta.list, text:{mainTextNew, tailNew, topPaddingNew}} //0:closed, 1: opening, 2: closing
   }
 
   componentDidUpdate(){
@@ -52,28 +56,20 @@ class Tile extends Component {
     } 
   }
 
-  getText2(tail) {
+  getText2(tail, labelWidth) {
     const lines = (this.props.widthLabel >= 350 ? 2 : 3)
-  
-    const {returnLinesText, returnLinesTailText, sep} = fit3 (lines, this.props.item.title, tail, this.state.labelWidth+3)
+
+    const {returnLinesText, returnLinesTailText, sep} = fit3 (lines, this.props.item.title, tail, labelWidth-2)
 
     const tailFlat = returnLinesTailText.text.flat()
     // const mainTextFlat = returnLinesText.text.flat()
     if(tailFlat[0] === "..."){
       tailFlat.shift()
-      // mainTextFlat.push("...")
       returnLinesText.textNew[returnLinesText.textNew.length-1] = returnLinesText.textNew[returnLinesText.textNew.length-1] + " ... "
     }
-    // const mainTextNew = mainTextFlat.join(sep)
-    const mainTextNew = returnLinesText.textNew.join(sep)
+    const adjSep = (sep === "/") ? "/ " : sep
+    const mainTextNew = returnLinesText.textNew.join(adjSep)
 
-    // const mainTextNew = returnLinesText.textNew.map((line,i) => {
-    //   if(i === returnLinesText.textNew.length-1 || line === ""){
-    //     return(<span>{line}</span>)
-    //   } else{
-    //     return(<span>{line}|<br/></span>)
-    //   }
-    //   })
     const tailNew = tailFlat.join(" ")
     const topPaddingNew = 76 / 2 - returnLinesTailText.text.length * 10
     return { mainTextNew, tailNew, topPaddingNew }
@@ -98,19 +94,21 @@ class Tile extends Component {
   }
 
   render() {
-    const tail = selectTail(this.props.item.label_info)
-    let height = null
-    if(this.props.openState === 'opening'){
-      //Calculate height
-      const {returnLinesText, returnLinesTailText, sep} = fit3 (15, this.props.item.title + "_" + tail, "tail", this.state.labelWidth)
-      height = (returnLinesText.lengths.length > returnLinesTailText.lengths.length) ? returnLinesText.lengths.length : returnLinesTailText.lengths.length
-    }
-    const heightText = (height === null) ? "" : "(" + height + ")"
-    // const { main_text, topPadding } = this.getText(tail)
-    const { mainTextNew, tailNew, topPaddingNew } = this.getText2(`... [${tail}]`)
+    // const tail = selectTail(this.props.item.label_info)
 
-    const thinText = <span className="text_nohighlight">{mainTextNew} <span className="tail">{tailNew}</span></span>
-    const fullText = <a href={this.props.item.tag} target="_blank"><span className="text_highlight">{this.state.fullText} <span className="tail">{tailNew}</span></span></a>
+    // let height = null
+    // if(this.props.openState === 'opening'){
+    //   //Calculate height
+    //   const {returnLinesText, returnLinesTailText, sep} = fit3(15, this.props.item.title + "_" + tail, "tail", this.state.labelWidth)
+    //   height = (returnLinesText.lengths.length > returnLinesTailText.lengths.length) ? returnLinesText.lengths.length : returnLinesTailText.lengths.length
+    // }
+    // const heightText = (height === null) ? "" : "(" + height + ")"
+    // const { main_text, topPadding } = this.getText(tail)
+    
+    // const { mainTextNew, tailNew, topPaddingNew } = this.getText2(`... [${tail}]`)
+
+    const thinText = <span className="text_nohighlight">{this.state.text.mainTextNew} <span className="tail">{this.state.text.tailNew}</span></span>
+    const fullText = <a href={this.props.item.tag} target="_blank"><span className="text_highlight">{this.state.fullText} <span className="tail">{this.state.text.tailNew}</span></span></a>
 
     const visible = (this.props.zoom <= this.props.item.count) ? "on" : "off"
    
@@ -125,7 +123,7 @@ class Tile extends Component {
             <div id="tile_container" className={`tile_container${(selected) ? "_selected" : ""}`}>
               <div id="header" className="main_detail" >
                 <ConditionalImage src={this.state.imgSrc} img_type={this.state.img_type} />
-                <div id="header_text" style={{ paddingTop: `${topPaddingNew}px` }}>
+                <div id="header_text" style={{ paddingTop: `${this.state.text.topPaddingNew}px` }}>
                   <Textfade text1={thinText} text2={fullText} index={(this.props.openState === "opening") ? 1 : 0} width={this.state.labelWidth} />
                 </div>
               </div>

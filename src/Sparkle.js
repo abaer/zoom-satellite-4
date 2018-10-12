@@ -8,7 +8,8 @@ const container = {
   display: "flex",
   alignItems: "center", //flex-end,
   justifyContent:"center",
-  maxHeight:"73px"
+  maxHeight:"73px",
+  marginLeft:-6,
 }
 
 const bar_base = {

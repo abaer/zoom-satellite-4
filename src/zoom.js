@@ -1,5 +1,5 @@
 function between(min, max, val) {
-  return Math.min(max, Math.max(min, parseInt(val)))
+  return Math.min(max, Math.max(min, parseInt(val, 10)))
 }
 
 function rFromScale(scale, max_label_count) {
@@ -13,7 +13,14 @@ function scaleFromR(scale, max_label_count){
 
 let oldFns = {}
 
+function wideFn(e){
+  e.preventDefault();
+}
+
 const zoom2 = (targ, r, stateHandlerFn, levels) => {
+  const wideTarg = document.getElementsByTagName("body")[0]
+  wideTarg.removeEventListener("gesturestart", wideFn)
+  wideTarg.addEventListener("gesturestart", wideFn)
   // const targ = document.getElementById('root')
   let max_label_count = levels.length+1
   let candidateScale, correction, candidateR

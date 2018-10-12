@@ -29,22 +29,23 @@ class App extends Component {
   getListFromUrl() {
     var urlParams = new URLSearchParams(window.location.search);
     const listName = urlParams.get('list')
-    if (listName === undefined || listName === null){
+    if (listName === undefined || listName === null) {
       return this.state.listDir
     }
     const listNameLower = listName.toLowerCase()
     console.log(listNameLower)
-    if (listmappings[listNameLower] === undefined){
+    if (listmappings[listNameLower] === undefined) {
       return this.state.listDir
     } else {
-      this.setState({ listDir: listmappings[listNameLower]  })
-      return listmappings[listNameLower];    
+      this.setState({ listDir: listmappings[listNameLower] })
+      return listmappings[listNameLower];
     }
   }
 
   handleData(ts) {
     const widthGraph = (ts.widthGraph !== undefined) ? ts.widthGraph : this.state.widthGraph
     const labels = JSON.parse(ts.json)
+    // const sortedLabelData = labels.label_data.sort((a, b) => b.tweet_data[0].date - a.tweet_data[0].date)
     const meta = labels["meta_data"]
     meta.startZoom = getInitialZoom(meta.step_counts, meta.steps)
     //Set up scale functions for sparkles
@@ -69,7 +70,7 @@ class App extends Component {
       })
       .then(myJson => {
         const previousSelected = this.state.selectedLabel
-        let ts = { listDir:dir, json: myJson, selectedLabel:null, previousSelected}
+        let ts = { listDir: dir, json: myJson, selectedLabel: null, previousSelected }
         this.handleData(ts)
       });
   }
@@ -97,12 +98,12 @@ class App extends Component {
     console.log("r")
     // this.setState({ selectedLabel:null, previousSelected:null })
     const previousSelected = this.state.selectedLabel
-    this.setState({ zoom: r, selectedLabel:null, previousSelected });
+    this.setState({ zoom: r, selectedLabel: null, previousSelected });
   }
 
   refCallbackChart = element => {
     if (element) {
-      const widthGraph = element.getBoundingClientRect().width
+      const widthGraph = element.getBoundingClientRect().width + 6
       this.stateUpdater({ widthGraph })
     }
 
@@ -139,7 +140,7 @@ class App extends Component {
         <header className="App-header">
           <h1 className="App-title">Twitter satellite</h1>
         </header>
-        <div id="zoom-frame" className="zoom-frame" ref={this.refCallbackZoom}>
+        <div id="zoom-frame" className="zoom-frame" style={{zIndex:10}} ref={this.refCallbackZoom}>
           <Grid fluid>
             {/*Test Grid for sizing */}
             <Row>
@@ -172,6 +173,7 @@ class App extends Component {
             </Row>
           </Grid>
         </div>
+
       </div>
     );
   }

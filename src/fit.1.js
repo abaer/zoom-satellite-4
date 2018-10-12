@@ -4,13 +4,14 @@ const element = document.createElement("canvas");
 const context = element.getContext("2d");
 const fit_font = "400 15px 'Roboto Condensed', sans-serif";
 const tail_font = "700 15px 'Roboto Condensed', sans-serif";
+const elipsesSize = getTextSize("...", fit_font)
 
 function getTextSize(txt, font = fit_font) {
   context.font = font;
   return context.measureText(txt).width;
 }
 
-function processLineText(atomizedText, lineWidth, maxLines, fit_font) {
+function processLineText(atomizedText, lineWidth, maxLines, fit_font, sep=" ") {
   let disposableAtomizedText = Array.from(atomizedText)
   let returnData = {text:[[]], lengths:[]}
   let thisLineWidth = 0;
@@ -19,8 +20,8 @@ function processLineText(atomizedText, lineWidth, maxLines, fit_font) {
 
   while (disposableAtomizedText.length > 0){
     const thisLine = returnData.text[returnData.text.length-1]
-    thisLineWidth = getTextSize(thisLine.join(" "), fit_font);
-    const space = (thisLine.length === 0) ? "" : " "
+    thisLineWidth = getTextSize(thisLine.join(sep), fit_font);
+    const space = (thisLine.length === 0) ? "" : sep
     nextWordWidth = getTextSize(disposableAtomizedText[0] + space, fit_font);
     const lastLine = (returnData.text.length >= maxLines)
     const lineWillExceed = ((thisLineWidth + nextWordWidth) >= lineWidthTemp[returnData.text.length - 1])
@@ -39,7 +40,6 @@ function processLineText(atomizedText, lineWidth, maxLines, fit_font) {
   returnData.lengths.push(thisLineWidth)
   return returnData
 }
-
 
 function atomizeText(text, sep = " ") {
   let startWords = text.split(sep);
@@ -80,6 +80,23 @@ function widthTemplateText(returnLinesTail, maxLines, lineWidth) {
   return template;
 }
 
+function checkForLastLineFit(atomizedText, returnLinesText, lineWidth, sep, returnLinesTailText){
+  let removeElipses = false
+  if(returnLinesText.text.flat().length === atomizedText.length - 1){
+    const lastWords = atomizedText.slice(Math.max(returnLinesText.text.flat().length, 0)).join(sep)
+    const lastWordSize = getTextSize(lastWords,fit_font)
+    const lastLineSize = returnLinesText.lengths[returnLinesText.lengths.length-1]
+    if(lastLineSize - elipsesSize + lastWordSize + returnLinesTailText.lengths[0] <= lineWidth){
+      console.log("last Line Fix:")
+      console.log(returnLinesText.text)
+      const lx = (Array.isArray(lastWords))? lastWords : [lastWords]
+      returnLinesText.text[returnLinesText.text.length-1].push(...lx) 
+      removeElipses = true
+    }
+  }
+  return removeElipses
+}
+
 const fit3 = (maxLines = 1, text, tailText, lineWidth) => {
   text = unesc(text)
   let sep = " "
@@ -94,31 +111,31 @@ const fit3 = (maxLines = 1, text, tailText, lineWidth) => {
   let returnLinesTailText = processLineText(Array.from(atomizedTailText).reverse(),lineWidth, maxLines, tail_font) 
 
   const tailTemplate = widthTemplateText(Array.from(returnLinesTailText.lengths).reverse(), maxLines, lineWidth)
-  const returnLinesText = processLineText(atomizedText, tailTemplate, maxLines, fit_font) 
+  const returnLinesText = processLineText(atomizedText, tailTemplate, maxLines, fit_font, sep) 
 
-  if(returnLinesText.text.length >= 1 && returnLinesText.text[returnLinesText.text.length-1] == ""){
+  if(returnLinesText.text.length >= 1 && returnLinesText.text[returnLinesText.text.length-1].length === 0){
     returnLinesText.text.pop()
     returnLinesText.lengths.pop()
   }
-
-  if (returnLinesText.text.flat().length === atomizedText.length) {
+  
+  if (returnLinesText.text.flat().length === atomizedText.length || checkForLastLineFit(atomizedText, returnLinesText, lineWidth, sep, returnLinesTailText)) {
     atomizedTailText.shift()
     const positiveTemplate = plainTemplate(returnLinesText.lengths, maxLines, lineWidth);
-    returnLinesTailText = processLineText(atomizedTailText, positiveTemplate, maxLines,tail_font) 
+    returnLinesTailText = processLineText(atomizedTailText, positiveTemplate, maxLines, tail_font) 
+    // console.log(returnLinesText, returnLinesTailText,positiveTemplate, lineWidth)
     returnLinesText.meta = {elipses:false}
   } else {
     returnLinesTailText.text = returnLinesTailText.text.map(line => line.reverse()).reverse()
-    returnLinesTailText.text = padResults(returnLinesTailText.text, maxLines)
+    if(sep === "/"){
+      console.log(returnLinesText, returnLinesTailText)
+    }
+    const padLength = (sep === "/") ? returnLinesText.lengths.length + returnLinesTailText.lengths.length -1 : maxLines
+    returnLinesTailText.text = padResults(returnLinesTailText.text, padLength)
     returnLinesText.meta = {elipses:true}
   }
 
   returnLinesText.textNew = returnLinesText.text.map(line => line.join(sep))
-
-  // console.log(returnLinesText.textNew.join(" "))
-  console.log(returnLinesText, returnLinesTailText)
-  console.log(returnLinesTailText.text.length)
   return {returnLinesText, returnLinesTailText, sep}
-
 };
 
 export default fit3;
