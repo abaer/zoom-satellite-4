@@ -34,7 +34,6 @@ class Sparkle extends Component {
     };
    
   }
-
   
   bar(x, y, i, all) {
     let width = this.state.barWidth

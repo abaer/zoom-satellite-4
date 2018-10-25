@@ -15,13 +15,6 @@ class TextFade extends Component {
     this.full_styles = ["full_hide", "full_hide full_hide_anim", "full_show"]
   }
 
-  // refCallbackFull = element => {
-  //   if (element) {
-  //     const widthLabel = element.getBoundingClientRect().width
-  //     console.log(widthLabel)
-  //   }
-  // };
-
    componentDidMount() {
     this.setState({initial:false})
   }
@@ -31,10 +24,8 @@ class TextFade extends Component {
     const width = this.props.width +1
     return (
       <div style={container}>
-
         <div style={{ width, zIndex:"10", backgroundColor:"white", }} className={this.thin_styles[index]} >{this.props.text1}</div>
         <div style={{ width, zIndex:"11", backgroundColor:"white",  }} className={this.full_styles[index]}>{this.props.text2}</div>
-
       </div>
     );
   }

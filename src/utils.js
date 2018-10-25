@@ -16,7 +16,6 @@ const getImage = (label_info) => {
   return { src: undefined, img_type: undefined }
 }
 
-
 const updateUrlBox = (newList) => {
   var url = window.location.href;
   var urlParts = url.split('?');
@@ -29,7 +28,6 @@ const updateUrlBox = (newList) => {
     // window.history.replaceState({}, document.title, updatedUri);
   }
 }
-
 function patchProfileURL(src) {
   var lastIndex = src.lastIndexOf("_");
   var tail = src.substring(src.lastIndexOf("."), )

@@ -17,6 +17,8 @@ function ConditionalImage(props) {
   let src = props.src
   if (props.img_type === "profile_image_url") {
     src = patchProfileURL(src)
+  } else if (props.img_type === "media_url"){
+    src = src.replace("https://s3.amazonaws.com/twitter-satellite/data-aws/shared_data", "https://d3isgivpcc5ypt.cloudfront.net") 
   }
   if (src !== undefined) {
     return (<div className="image_frame" style={{ float: "left", height: '70px' }}>
@@ -86,27 +88,13 @@ class Tile extends Component {
       return true
     } else if(this.props.meta.list !== this.state.list){
       return true;
-    } 
-    if(nextProps.openState === "opening" || nextProps.openState === "closing"){
+    } else if(nextProps.openState === "opening" || nextProps.openState === "closing"){
       return true
     }
     return false
   }
 
   render() {
-    // const tail = selectTail(this.props.item.label_info)
-
-    // let height = null
-    // if(this.props.openState === 'opening'){
-    //   //Calculate height
-    //   const {returnLinesText, returnLinesTailText, sep} = fit3(15, this.props.item.title + "_" + tail, "tail", this.state.labelWidth)
-    //   height = (returnLinesText.lengths.length > returnLinesTailText.lengths.length) ? returnLinesText.lengths.length : returnLinesTailText.lengths.length
-    // }
-    // const heightText = (height === null) ? "" : "(" + height + ")"
-    // const { main_text, topPadding } = this.getText(tail)
-    
-    // const { mainTextNew, tailNew, topPaddingNew } = this.getText2(`... [${tail}]`)
-
     const thinText = <span className="text_nohighlight">{this.state.text.mainTextNew} <span className="tail">{this.state.text.tailNew}</span></span>
     const fullText = <a href={this.props.item.tag} target="_blank"><span className="text_highlight">{this.state.fullText} <span className="tail">{this.state.text.tailNew}</span></span></a>
 

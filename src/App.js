@@ -7,13 +7,14 @@ import { zoom2 } from './zoom.js'
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { scaleLinear, scaleSqrt } from "d3-scale";
 import { getInitialZoom } from './data';
-import { listmappings, keyByVal } from './settings'
+import { listmappings } from './settings'
 
 
 function makeS3Url(listDir, date = "today") {
   const dt = (date === "today") ? getDateString() : date
-  const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}-label_format.json`
-  // const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}.json`
+  // const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/shared_data/production/${dt}/${listDir}.json`
+  const listUrl = `http://d1x6n6m1jfvyc3.cloudfront.net/${dt}/${listDir}.json`
+  // const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}-label_format.json`
   return listUrl
 }
 class App extends Component {
@@ -22,7 +23,7 @@ class App extends Component {
     this.stateSetterZoom = this.stateSetterZoom.bind(this);
     this.listHandler = this.listHandler.bind(this);
     this.labelSelectorBroadcast = this.labelSelectorBroadcast.bind(this);
-    this.state = { labelArray: [], zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0, previousSelected: null, listDir: "gen_two", meta: null }
+    this.state = { labelArray: [], zoom: 2, selectedLabel: null, widthLabel: 0, widthGraph: 0, previousSelected: null, listDir: "abbaer", meta: null }
     this.ts = {}
   }
 
@@ -32,13 +33,13 @@ class App extends Component {
     if (listName === undefined || listName === null) {
       return this.state.listDir
     }
-    const listNameLower = listName.toLowerCase()
-    console.log(listNameLower)
-    if (listmappings[listNameLower] === undefined) {
+    // const listNameLower = listName.toLowerCase()
+    console.log(listName)
+    if (listmappings.includes(listName) === false) {
       return this.state.listDir
     } else {
-      this.setState({ listDir: listmappings[listNameLower] })
-      return listmappings[listNameLower];
+      this.setState({ listDir: listName })
+      return listName;
     }
   }
 
@@ -60,17 +61,16 @@ class App extends Component {
   }
 
   listHandler(e) {
-    const dir = e.target.value
-    const name = keyByVal(listmappings, dir)
+    const name = e.target.value
     updateUrlBox(name)
-    const listUrl = makeS3Url(dir)
+    const listUrl = makeS3Url(name)
     fetch(listUrl)
       .then(response => {
         return response.json();
       })
       .then(myJson => {
         const previousSelected = this.state.selectedLabel
-        let ts = { listDir: dir, json: myJson, selectedLabel: null, previousSelected }
+        let ts = { listDir: name, json: myJson, selectedLabel: null, previousSelected }
         this.handleData(ts)
       });
   }
