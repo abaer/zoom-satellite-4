@@ -12,9 +12,7 @@ import { listmappings } from './settings'
 
 function makeS3Url(listDir, date = "today") {
   const dt = (date === "today") ? getDateString() : date
-  // const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/shared_data/production/${dt}/${listDir}.json`
   const listUrl = `http://d1x6n6m1jfvyc3.cloudfront.net/${dt}/${listDir}.json`
-  // const listUrl = `https://s3.amazonaws.com/twitter-satellite/data-aws/${listDir}/production/d3-${dt}-label_format.json`
   return listUrl
 }
 class App extends Component {
@@ -33,7 +31,6 @@ class App extends Component {
     if (listName === undefined || listName === null) {
       return this.state.listDir
     }
-    // const listNameLower = listName.toLowerCase()
     console.log(listName)
     if (listmappings.includes(listName) === false) {
       return this.state.listDir

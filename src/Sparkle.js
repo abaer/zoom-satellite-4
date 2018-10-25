@@ -37,12 +37,9 @@ class Sparkle extends Component {
   
   bar(x, y, i, all) {
     let width = this.state.barWidth
-    // const width = (this.state.minXGap > 2) ? 2 : 1
-    // const leftMargM1 = (i > 0) ? Math.floor(this.state.rangeData[i-1].x - width*i) : 0
     let leftMarg = (i > 0) ? Math.floor(x - this.state.rangeData[i-1].x - width) : Math.floor(x)
     if(leftMarg  < width -1){
       leftMarg = leftMarg +.5
-      // width = 1;
     }
     
     return {

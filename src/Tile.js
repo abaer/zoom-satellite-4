@@ -45,7 +45,6 @@ class Tile extends Component {
     const imageWidth = (img_type !== undefined) ? 75 : 18
     const labelWidth = Math.ceil(this.props.widthLabel - imageWidth) + 2
     const fullText = unesc(this.props.item.title)
-
     const tail = selectTail(this.props.item.label_info)
     const { mainTextNew, tailNew, topPaddingNew } = this.getText2(`... [${tail}]`, labelWidth)
 
@@ -60,11 +59,8 @@ class Tile extends Component {
 
   getText2(tail, labelWidth) {
     const lines = (this.props.widthLabel >= 350 ? 2 : 3)
-
     const {returnLinesText, returnLinesTailText, sep} = fit3 (lines, this.props.item.title, tail, labelWidth-2)
-
     const tailFlat = returnLinesTailText.text.flat()
-    // const mainTextFlat = returnLinesText.text.flat()
     if(tailFlat[0] === "..."){
       tailFlat.shift()
       returnLinesText.textNew[returnLinesText.textNew.length-1] = returnLinesText.textNew[returnLinesText.textNew.length-1] + " ... "
@@ -97,11 +93,8 @@ class Tile extends Component {
   render() {
     const thinText = <span className="text_nohighlight">{this.state.text.mainTextNew} <span className="tail">{this.state.text.tailNew}</span></span>
     const fullText = <a href={this.props.item.tag} target="_blank"><span className="text_highlight">{this.state.fullText} <span className="tail">{this.state.text.tailNew}</span></span></a>
-
     const visible = (this.props.zoom <= this.props.item.count) ? "on" : "off"
-   
     const selected = (this.props.openState === 'opening')
-    // const selected = (this.props.selectedLabel === this.props.item.key)
     
     return (
       <div className="totalContainer" onClick={this.toggleSelect} id={"tile_container_"+this.props.item.key}>
