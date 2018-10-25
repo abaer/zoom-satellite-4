@@ -43,9 +43,9 @@ class App extends Component {
   handleData(ts) {
     const widthGraph = (ts.widthGraph !== undefined) ? ts.widthGraph : this.state.widthGraph
     const labels = JSON.parse(ts.json)
-    // const sortedLabelData = labels.label_data.sort((a, b) => b.tweet_data[0].date - a.tweet_data[0].date)
     const meta = labels["meta_data"]
     meta.startZoom = getInitialZoom(meta.step_counts, meta.steps)
+
     //Set up scale functions for sparkles
     meta.yScale = scaleSqrt().domain(meta.yMeta).range([5, 30]);
     meta.xScale = scaleLinear().domain([meta.xMeta[0], meta.xMeta[1] + .1 * (meta.xMeta[1] - meta.xMeta[0])]).range([2, widthGraph - 2]);
@@ -119,7 +119,6 @@ class App extends Component {
   }
 
   componentDidMount = () => {
-    //const list_dir = 'test_dir_om_2'
     const listDir = this.getListFromUrl()
     const defaultUrl = makeS3Url(listDir)
     fetch(defaultUrl)
